@@ -2,9 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import tkinter.font as tkFont
 
-PASSWORD = "shisei123"  # パスワード設定
-
-def create_fullscreen_window():
+def locker(PASSWORD:str):
     root = tk.Tk()
     root.title("パスワードで閉じるウィンドウ")
 
@@ -18,7 +16,7 @@ def create_fullscreen_window():
     frame.place(relx=0.5, rely=0.5, anchor="center")
 
     # メッセージラベル
-    label = tk.Label(frame, text="パソコンはもうすぐ爆発します", 
+    label = tk.Label(frame, text="パソコンはもうすぐ爆発します, 直ちに勉強に戻ってください", 
                      font=("BIZ UDPMincho Medium", 24), fg="white", bg="black")
     label.pack(pady=20)
     label = tk.Label(frame, text="ウィンドウを閉じるにはパスワードを入力してください", 
@@ -48,16 +46,5 @@ def create_fullscreen_window():
 
     root.mainloop()
 
-create_fullscreen_window()
 
-def list_available_fonts():
-    root = tk.Tk()
-    root.withdraw()  # ウィンドウを表示しない
 
-    fonts = sorted(tkFont.families())
-    for font in fonts:
-        print(font)
-
-    root.destroy()
-
-# list_available_fonts()
