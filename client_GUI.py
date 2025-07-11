@@ -17,7 +17,7 @@ class DynamicButtonApp:
         # macOS/Linux の場合は 'Yu Gothic UI', 'Hiragino Sans', 'Noto Sans CJK JP' などに調整
         self.style = ttk.Style()
         self.style.configure('.', font=('BIZ UDPMincho Medium', 12))
-        self.style.configure('TButton', font=('BIZ UDPMincho Medium', 12, 'bold'), padding=10) # ボタンにパディングを追加
+        self.style.configure('TButton', font=('Microsoft YaHei', 12), padding=10) # ボタンにパディングを追加
 
         # ボタンの背景色とテキスト色を設定する例（テーマによっては上書きされる可能性あり）
         # self.style.map('TButton', 
@@ -32,8 +32,8 @@ class DynamicButtonApp:
         self.create_widgets()
         self.update_buttons() # 初期ボタンの表示
 
-        # ウィンドウの初期サイズを設定（任意）
-        self.master.geometry("380x240") # 幅x高さ
+        # ウィンドウの初期サイズを設定
+        self.master.geometry("380x608") # 幅x高さ
         # ウィンドウを中央に配置する（任意）
         self.master.update_idletasks() # ウィジェットの実際のサイズを計算させる
         x = (self.master.winfo_screenwidth() // 2) - (self.master.winfo_width() // 2)
@@ -48,7 +48,7 @@ class DynamicButtonApp:
 
         ttk.Label(control_frame, text="ボタンの数:").pack(side=tk.LEFT, padx=(0, 10)) # ラベルとエントリーの間に余白
 
-        self.count_entry = ttk.Entry(control_frame, textvariable=self.button_count, width=5, justify='center') # 中央揃え
+        self.count_entry = ttk.Entry(control_frame, textvariable=self.button_count, width=15, justify='center') # 中央揃え
         self.count_entry.pack(side=tk.LEFT, padx=5)
         self.count_entry.bind("<Return>", self.on_enter_pressed)
 
@@ -68,9 +68,10 @@ class DynamicButtonApp:
     def on_button_click(self, button_id, button_widget):
         """ボタンがクリックされたときに実行されるハンドラ"""
 
-        client.start_client("127.0.0.1", msg="hello")
+        client.start_client("192.168.40.143", msg="lock")
 
         original_text = f"ボタン {button_id}"
+        print(f"{original_text} がクリックされました。")
 
         # 既にタイマーがセットされている場合はキャンセル
         if button_widget in self.button_reset_timers:

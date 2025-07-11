@@ -1,6 +1,8 @@
 # ==== マルチクライアント対応サーバー ====
 import socket
 import threading
+import screen_locker
+import password
 
 def handle_client(conn, addr):
     print(f"[サーバー] 接続：{addr}")
@@ -11,8 +13,15 @@ def handle_client(conn, addr):
                 if not data: # 終了のサインif data == b'': と同じ意味
                     print("ここで終了させていただきます")
                     break
+                recved_data = data.decode()
+                
+                if recved_data == "lock":
+                    password_str = password.make_password()
+                    screen_locker.locker(password_str)
+                
                 print(f"[サーバー] 受信({addr})：{data.decode()}")
                 conn.sendall(f"受信しました: {data.decode()}".encode())
+                
             except ConnectionResetError:
                 print(f"[サーバー] クライアント({addr})が強制的に接続を切断しました。")
                 break
