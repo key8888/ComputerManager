@@ -2,7 +2,7 @@ from screen_locker import locker
 from password import make_password
 from pathlib import Path
 import server
-import client
+import client_GUI
 import yaml
 
 file_path = Path(__file__).parent / "config.yaml"
@@ -20,9 +20,8 @@ def main():
     if config.get("type") == "server":
         server.start_server()
     elif config.get("type") == "client":
-        client.start_client("192.168.40.6")
+        client_GUI.start_gui()
 
-# if __name__ == "__main__":
-#     PASSWORD = make_password()
-#     locker(PASSWORD)
+if __name__ == "__main__":
+    main()
 
