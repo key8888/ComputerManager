@@ -7,12 +7,15 @@ from ttkthemes import ThemedTk
 
 
 class DynamicButtonApp:
-    def __init__(self, master):
+    from typing import Optional
+
+    def __init__(self, master, devices: Optional[dict] = None):
         self.master = master
+        self.devices = devices if devices is not None else {}
         # ThemedTk を使用してテーマを適用
         # 'adapta', 'arc', 'elegance', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative' などがあります
         self.master.set_theme("adapta")
-        master.title("動的ボタンの美しいウィンドウ")
+        master.title("Lab manager")
 
         # --- フォントの設定 ---
         # Microsoft YaHei が利用可能であることを前提
@@ -35,7 +38,7 @@ class DynamicButtonApp:
         self.update_buttons()  # 初期ボタンの表示
 
         # ウィンドウの初期サイズを設定
-        self.master.geometry("380x608")  # 幅x高さ
+        self.master.geometry("260x380")  # 幅x高さ
         # ウィンドウを中央に配置する（任意）
         self.master.update_idletasks()  # ウィジェットの実際のサイズを計算させる
         x = (self.master.winfo_screenwidth() // 2) - \
@@ -50,17 +53,17 @@ class DynamicButtonApp:
         control_frame = ttk.Frame(self.master, padding="15 10")  # 左右15、上下10
         control_frame.pack(pady=10, fill=tk.X)  # 上下の余白と横方向の引き伸ばし
 
-        ttk.Label(control_frame, text="ボタンの数:").pack(
-            side=tk.LEFT, padx=(0, 10))  # ラベルとエントリーの間に余白
+        # ttk.Label(control_frame, text="ボタンの数:").pack(
+        #     side=tk.LEFT, padx=(0, 10))  # ラベルとエントリーの間に余白
 
-        self.count_entry = ttk.Entry(
-            control_frame, textvariable=self.button_count, width=15, justify='center')  # 中央揃え
-        self.count_entry.pack(side=tk.LEFT, padx=5)
-        self.count_entry.bind("<Return>", self.on_enter_pressed)
+        # self.count_entry = ttk.Entry(
+        #     control_frame, textvariable=self.button_count, width=15, justify='center')  # 中央揃え
+        # self.count_entry.pack(side=tk.LEFT, padx=5)
+        # self.count_entry.bind("<Return>", self.on_enter_pressed)
 
-        update_button = ttk.Button(
-            control_frame, text="更新", command=self.update_buttons)
-        update_button.pack(side=tk.LEFT, padx=(10, 0))  # エントリーとボタンの間に余白
+        # update_button = ttk.Button(
+        #     control_frame, text="更新", command=self.update_buttons)
+        # update_button.pack(side=tk.LEFT, padx=(10, 0))  # エントリーとボタンの間に余白
 
         # control_frame 内の要素を中央に寄せるための調整
         control_frame.grid_columnconfigure(0, weight=1)
@@ -73,23 +76,25 @@ class DynamicButtonApp:
         self.button_frame.pack(expand=True, fill=tk.BOTH,
                                padx=10, pady=5)  # 外側のパディング
 
-    def on_button_click(self, button_id, button_widget):
+    def on_button_click(self, original_text, button_widget):
         """ボタンがクリックされたときに実行されるハンドラ"""
 
-        # client.start_client("192.168.40.143", msg="lock")
+
+        print(f"{original_text} がクリックされました。")
+        
+        # lock命令を送信
+        # self.devices[original_text] は IP アドレスを指す
         threading.Thread(target=client.start_client,
-                         kwargs={"server_ip": "192.168.40.143", "msg": "lock"}
+                         kwargs={"server_ip": self.devices[original_text], "msg": "lock"}
                          ).start()
 
-        original_text = f"ボタン {button_id}"
-        print(f"{original_text} がクリックされました。")
 
         # 既にタイマーがセットされている場合はキャンセル
         if button_widget in self.button_reset_timers:
             self.master.after_cancel(self.button_reset_timers[button_widget])
 
-        # ボタンのテキストを「押された」に変更し、一時的に無効化
-        button_widget.config(text="押された", state=tk.DISABLED)  # 無効化
+        # ボタンのテキストを「ロックに成功」に変更し、一時的に無効化
+        button_widget.config(text="ロックに成功", state=tk.DISABLED)  # 無効化
 
         # 5秒後に元のテキストに戻す処理をスケジュール
         timer_id = self.master.after(
@@ -106,7 +111,8 @@ class DynamicButtonApp:
     def update_buttons(self, event=None):
         """エントリーの値に基づいてボタンを更新する"""
         try:
-            new_count = self.button_count.get()
+            # new_count = self.button_count.get()
+            new_count = len(self.devices)  # devices の数を取得
             if not isinstance(new_count, int) or new_count < 0:
                 raise ValueError("無効な数値です。0以上の整数を入力してください。")
         except tk.TclError:
@@ -128,10 +134,12 @@ class DynamicButtonApp:
         self.buttons.clear()
 
         # 新しい数のボタンを作成し配置
-        for i in range(new_count):
-            button = ttk.Button(self.button_frame, text=f"ボタン {i+1}")
+        # for i in range(new_count):
+        for i, device_name in enumerate(self.devices):
+            button = ttk.Button(self.button_frame, text=device_name,
+                                width=20, padding=5)  # ボタンの幅とパディング
             button.config(command=lambda id=i+1,
-                          btn=button: self.on_button_click(id, btn))
+                          btn=button: self.on_button_click(device_name, btn))
 
             # グリッドレイアウトで配置
             row = i // 3
@@ -151,13 +159,8 @@ class DynamicButtonApp:
         self.update_buttons()
 
 
-def start_gui():
+def start_gui(devices: dict) -> None:
     root = ThemedTk()  # ThemedTk を使用してテーマを適用
-    app = DynamicButtonApp(root)
+    app = DynamicButtonApp(root, devices)
     root.mainloop()
 
-# if __name__ == "__main__":
-#     # tk.Tk() の代わりに ThemedTk() を使用
-#     root = ThemedTk()
-#     app = DynamicButtonApp(root)
-#     root.mainloop()
