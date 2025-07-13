@@ -1,6 +1,8 @@
-import tkinter as tk
 from tkinter import messagebox
-import tkinter.font as tkFont
+from read_yaml import get_config
+
+import tkinter as tk
+
 
 def locker(PASSWORD:str):
     root = tk.Tk()
@@ -16,7 +18,7 @@ def locker(PASSWORD:str):
     frame.place(relx=0.5, rely=0.5, anchor="center")
 
     # メッセージラベル
-    label = tk.Label(frame, text="パソコンはもうすぐ爆発します, 直ちに勉強に戻ってください", 
+    label = tk.Label(frame, text=get_config("lockmsg"), 
                      font=("BIZ UDPMincho Medium", 24), fg="white", bg="black")
     label.pack(pady=20)
     label = tk.Label(frame, text="ウィンドウを閉じるにはパスワードを入力してください", 
