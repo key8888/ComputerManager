@@ -16,7 +16,8 @@ def client_check(ip_list: list) -> dict:
     for ip in ip_list:
         try:
             response = start_client(server_ip=ip, msg="hostname")
-            results[ip] = response
+            # results[ip] = response
+            results[response] = ip 
         except Exception as e:
             # results[ip] = f"接続失敗: {str(e)}"
             print(e)
