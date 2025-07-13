@@ -3,6 +3,8 @@ import socket
 import threading
 import screen_locker
 import password
+from read_yaml import get_config
+
 
 def handle_client(conn, addr):
     print(f"[サーバー] 接続：{addr}")
@@ -15,6 +17,8 @@ def handle_client(conn, addr):
                     break
                 recved_data = data.decode()
                 
+                if recved_data == "hostname":
+                    conn.sendall(get_config("hostname").encode())
                 if recved_data == "lock":
                     password_str = password.make_password()
                     screen_locker.locker(password_str)
