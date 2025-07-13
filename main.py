@@ -1,26 +1,20 @@
-from screen_locker import locker
-from password import make_password
-from pathlib import Path
+from read_yaml import get_config
+from client import client_check
+
 import server
+
 import client_GUI
-import yaml
+import network_scanner
 
-file_path = Path(__file__).parent / "config.yaml"
-config = {}
-
-try:
-    with open(file_path, 'r', encoding='utf-8') as file:
-        config = yaml.safe_load(file)
-except FileNotFoundError:
-    print(f"設定ファイルが見つかりません: {file_path}")
-except yaml.YAMLError as e:
-    print(f"YAMLの解析エラー: {e}")
 
 def main():
-    if config.get("type") == "server":
+    if get_config("type") == "server":
         server.start_server()
-    elif config.get("type") == "client":
-        client_GUI.start_gui()
+    elif get_config("type") == "client":
+        all_devices: list = network_scanner.get_live_devices()
+        client_results: dict = client_check(all_devices)
+        print(client_results)
+        # client_GUI.start_gui()
 
 if __name__ == "__main__":
     main()
