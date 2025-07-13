@@ -14,7 +14,7 @@ def main():
         all_devices: list = network_scanner.get_live_devices()
         client_results: dict = client_check(all_devices)
         print(client_results)
-        # client_GUI.start_gui()
+        client_GUI.start_gui(client_results)
 
 if __name__ == "__main__":
     main()
